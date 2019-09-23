@@ -1,12 +1,10 @@
 # Kotlin delegates in Android
 
-Kotlin is truly a beautiful language with some great features that make application development a fun and exciting experience. One of these features is [Delegated Properties](https://kotlinlang.org/docs/reference/delegated-properties.html). In this post we will see how delegates can be used in Android development.
+Kotlin is truly a beautiful language with some great features that make application development a fun and exciting experience. One of such features is [Delegated Properties](https://kotlinlang.org/docs/reference/delegated-properties.html). In this post we will see how delegates can make our life easier in Android development.
 
 ## Basics
 
-First of all, what is a delegate and how does it work? 
-
-Well, a delegate is just a class that provides the value for a property and handles its changes. This allows us to move, or delegate, the getter-setter logic from the property itself to a separate class, letting us reuse this logic. 
+First of all, what is a delegate and how does it work? A delegate is just a class that provides the value for a property and handles its changes. This allows us to move, or delegate, the getter-setter logic from the property itself to a separate class, letting us reuse this logic. 
 
 You can read more in the official [docs](https://kotlinlang.org/docs/reference/delegated-properties.html).
 
@@ -151,7 +149,7 @@ class FragmentNullableArgumentDelegate<T : Any?> : ReadWriteProperty<Fragment, T
 }
 ```
 
-Next, let's make some functions for convenience (it is not necessary, just purely for an aesthetic purpose):
+Next, let's make some functions for convenience (it is not necessary, just purely for aesthetic purposes):
 ```kotlin
 fun <T : Any> delegateArg(): ReadWriteProperty<Fragment, T> =
 	FragmentArgumentDelegate()
