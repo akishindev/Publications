@@ -176,3 +176,50 @@ class DemoFragment : Fragment() {
 ```
 
 Looks pretty neat, doesn't it?
+
+## SharedPreferences delegates
+
+Quite often we need to store some (small) number of values in memory to quickly retrieve them next time the app launches. For example, we might want to store some user preferences that let users customize the app. A common way to do this is to use [SharedPreferences](https://developer.android.com/reference/android/content/SharedPreferences.html) and save key-value data in them. 
+
+So, let's say we have some class that is responsible for saving and obtaining three parameters:
+```kotlin
+class Settings(context: Context) {
+
+	private val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+
+	fun getParam1(): String? {
+		return prefs.getString(PrefKeys.PARAM1, null)
+	}
+
+	fun saveParam1(param1: String?) {
+		prefs.edit().putString(PrefKeys.PARAM1, param1).apply()
+	}
+
+	fun getPref2(defaultValue: Int): Int {
+		return prefs.getInt(PrefKeys.PARAM2, defaultValue)
+	}
+
+	fun saveParam2(param2: Int) {
+		prefs.edit().putInt(PrefKeys.PARAM2, param2).apply()
+	}
+	
+	fun getPref3(defaultValue: String): String {
+		return prefs.getString(PrefKeys.PARAM3, null) ?: defaultValue
+	}
+
+	fun saveParam3(param3: String) {
+		prefs.edit().putString(PrefKeys.PARAM2, param3).apply()
+	}
+	
+	companion object {
+		private object PrefKeys{
+			const val PARAM1 = "param1"
+			const val PARAM2 = "param3"
+			const val PARAM3 = "param3"
+		}
+	}
+}
+```
+
+Here we obtain default SharedPreferences and provide methods for getting and saving the values of our parameters.
+
