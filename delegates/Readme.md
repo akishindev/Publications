@@ -377,7 +377,7 @@ fun TextView.text(): ReadWriteProperty<Any, String> =
 	}
 ```
 And now use it in our `CustomView`:
-```
+```kotlin
 class CustomView @JvmOverloads constructor(
 	context: Context,
 	attrs: AttributeSet? = null
