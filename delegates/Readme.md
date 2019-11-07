@@ -304,7 +304,7 @@ Looks a lot cooler!
 ## View delegates
 
 Suppose we have a custom view, that consists of three text fields - a title, a subtitle and a description - with this simple layout:
-```kotlin
+```xml
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
