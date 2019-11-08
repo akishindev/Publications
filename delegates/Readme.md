@@ -310,9 +310,7 @@ Now it looks much better. And if we need a new parameter in the future, it can b
 
 Suppose we have a custom view, that consists of three text fields - a title, a subtitle and a description - with this simple layout:
 ```xml
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -338,48 +336,48 @@ Suppose we have a custom view, that consists of three text fields - a title, a s
 And we want our `CustomView` to provide methods for accessing and changing text of these fields:
 ```kotlin
 class CustomView @JvmOverloads constructor(
-	context: Context,
-	attrs: AttributeSet? = null
+    context: Context,
+    attrs: AttributeSet? = null
 ) : FrameLayout(context, attrs) {
 
-	var title: String
-		get() = tvTitle.text.toString()
-		set(value) {
-			tvTitle.text = value
-		}
+    var title: String
+        get() = tvTitle.text.toString()
+        set(value) {
+            tvTitle.text = value
+        }
 
-	var subtitle: String
-		get() = tvSubtitle.text.toString()
-		set(value) {
-			tvSubtitle.text = value
-		}
+    var subtitle: String
+        get() = tvSubtitle.text.toString()
+        set(value) {
+            tvSubtitle.text = value
+        }
 
-	var description: String
-		get() = tvDescription.text.toString()
-		set(value) {
-			tvDescription.text = value
-		}
+    var description: String
+        get() = tvDescription.text.toString()
+        set(value) {
+            tvDescription.text = value
+        }
 
-	init {
-		inflate(context, R.layout.custom_view, this)
-	}
+    init {
+        inflate(context, R.layout.custom_view, this)
+    }
 }
 ```
 Here we use [View binding](https://kotlinlang.org/docs/tutorials/android-plugin.html#view-binding) from [Kotlin Android Extensions](https://kotlinlang.org/docs/tutorials/android-plugin.html) to access views inside the layout.
 
-It is obvious that we have some code that can be easity moved to a separate entity. So let's do exactly that with the help of delegates! 
+It is clear that we have some code that can be easity moved to a separate entity. So let's do exactly that with the help of delegates! 
 
 Let's write a TextView extension function that returns a delegate for working with its text:
 ```kotlin
 fun TextView.text(): ReadWriteProperty<Any, String> =
-	object: ReadWriteProperty<Any, String>{
-		override fun getValue(thisRef: Any, property: KProperty<*>): String =
-			text.toString()
+    object : ReadWriteProperty<Any, String> {
+        override fun getValue(thisRef: Any, property: KProperty<*>): String =
+            text.toString()
 
-		override fun setValue(thisRef: Any, property: KProperty<*>, value: String) {
-			text = value
-		}
-	}
+        override fun setValue(thisRef: Any, property: KProperty<*>, value: String) {
+            text = value
+        }
+    }
 ```
 And now use it in our `CustomView`:
 ```kotlin
@@ -391,7 +389,7 @@ class CustomView @JvmOverloads constructor(
 	var title by tvTitle.text()
 	var subtitle by tvSubtitle.text()
 	var description by tvDescription.text()
-	
+
 	init {
 		inflate(context, R.layout.custom_view, this)
 	}
@@ -399,39 +397,53 @@ class CustomView @JvmOverloads constructor(
 ```
 It may not seem like a crazy improvement over the original code, but the point is to demonstrate the power of delegates. Besides, they are so fun to write!
 
-Of course, you are not limited to TextViews. For example, here is a delegate for view visibility (`keepBounds` determines whether invisible view should still take up space in layout or not):
+Of course, you are not limited to TextView. For example, here is a delegate for view visibility (`keepBounds` determines whether the view should still take up space in layout or not when it's not visible):
 ```kotlin
 fun View.isVisible(keepBounds: Boolean = false): ReadWriteProperty<Any, Boolean> =
-	object : ReadWriteProperty<Any, Boolean> {
-		override fun getValue(thisRef: Any, property: KProperty<*>): Boolean =
-			visibility == View.VISIBLE
+    object : ReadWriteProperty<Any, Boolean> {
+        override fun getValue(thisRef: Any, property: KProperty<*>): Boolean =
+            visibility == View.VISIBLE
 
-		override fun setValue(thisRef: Any, property: KProperty<*>, value: Boolean) {
-			visibility = when {
-				value -> View.VISIBLE
-				keepBounds -> View.INVISIBLE
-				else -> View.GONE
-			}
-		}
-	}
+        override fun setValue(thisRef: Any, property: KProperty<*>, value: Boolean) {
+            visibility = when {
+                value -> View.VISIBLE
+                keepBounds -> View.INVISIBLE
+                else -> View.GONE
+            }
+        }
+    }
 ```
 
-Or here is a delegate for progress in a ProgressBar as a float number from 0 to 1:
+And here is a delegate for progress in a ProgressBar as a float number from 0 to 1:
 ```kotlin
-fun ProgressBar.progressFloat(): ReadWriteProperty<Any, Float> =
-	object : ReadWriteProperty<Any, Float> {
-		override fun getValue(thisRef: Any, property: KProperty<*>): Float =
-			if (max == 0) 0f else progress / max.toFloat()
+fun ProgressBar.progress(): ReadWriteProperty<Any, Float> =
+    object : ReadWriteProperty<Any, Float> {
+        override fun getValue(thisRef: Any, property: KProperty<*>): Float =
+            if (max == 0) 0f else progress / max.toFloat()
 
-		override fun setValue(thisRef: Any, property: KProperty<*>, value: Float) {
-			progress = (value * max).toInt()
-		}
-	}
+        override fun setValue(thisRef: Any, property: KProperty<*>, value: Float) {
+            progress = (value * max).toInt()
+        }
+    }
 ```
-And this is how we would use them:
+And this is how we could use them if we had a progressBar in our `CustomView`:
 ```kotlin
-var isProgressVisible by progressBar.isVisible()
-var progress by progressBar.progressFloat()
+class CustomView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null
+) : FrameLayout(context, attrs) {
+
+    var title by tvTitle.text()
+    var subtitle by tvSubtitle.text()
+    var description by tvDescription.text()
+
+    var progress by progressBar.progress()
+    var isProgressVisible by progressBar.isVisible()
+
+    init {
+        inflate(context, R.layout.custom_view, this)
+    }
+}
 ```
 
-As you can see, you can delegate whatever you want - the sky is the limit!
+As you can see, you can delegate whatever you want - really, the sky is the limit!
