@@ -183,127 +183,128 @@ Looks pretty neat, doesn't it?
 
 ## SharedPreferences delegates
 
-Quite often we need to store some values in memory to quickly retrieve them next time the app launches. For example, we might want to store some user preferences that let users customize the app. A common way to do this is to use [SharedPreferences](https://developer.android.com/reference/android/content/SharedPreferences.html) and save key-value data in them. 
+Quite often we need to store some values in memory to quickly retrieve them the next time the app launches. For example, we might want to store some user preferences that let users customize the app. A common way to do this is to use [SharedPreferences](https://developer.android.com/reference/android/content/SharedPreferences.html) and save key-value data in them. 
 
 So, let's say we have some class that is responsible for saving and obtaining three parameters:
 ```kotlin
 class Settings(context: Context) {
 
-	private val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+    private val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
-	fun getParam1(): String? {
-		return prefs.getString(PrefKeys.PARAM1, null)
-	}
+    fun getParam1(): String? {
+        return prefs.getString(PrefKeys.PARAM1, null)
+    }
 
-	fun saveParam1(param1: String?) {
-		prefs.edit().putString(PrefKeys.PARAM1, param1).apply()
-	}
+    fun saveParam1(param1: String?) {
+        prefs.edit().putString(PrefKeys.PARAM1, param1).apply()
+    }
 
-	fun getParam2(): Int {
-		return prefs.getInt(PrefKeys.PARAM2, 0)
-	}
+    fun getParam2(): Int {
+        return prefs.getInt(PrefKeys.PARAM2, 0)
+    }
 
-	fun saveParam2(param2: Int) {
-		prefs.edit().putInt(PrefKeys.PARAM2, param2).apply()
-	}
+    fun saveParam2(param2: Int) {
+        prefs.edit().putInt(PrefKeys.PARAM2, param2).apply()
+    }
 
-	fun getParam3(): String {
-		return prefs.getString(PrefKeys.PARAM3, null) ?: DefaulsValues.PARAM3
-	}
+    fun getParam3(): String {
+        return prefs.getString(PrefKeys.PARAM3, null) ?: DefaulsValues.PARAM3
+    }
 
-	fun saveParam3(param3: String) {
-		prefs.edit().putString(PrefKeys.PARAM2, param3).apply()
-	}
+    fun saveParam3(param3: String) {
+        prefs.edit().putString(PrefKeys.PARAM2, param3).apply()
+    }
 
-	companion object {
-		private object PrefKeys{
-			const val PARAM1 = "param1"
-			const val PARAM2 = "param2"
-			const val PARAM3 = "key_param3"
-		}
-		private object DefaulsValues{
-			const val PARAM3 = "defaultParam3"
-		}
-	}
+    companion object {
+        private object PrefKeys {
+            const val PARAM1 = "param1"
+            const val PARAM2 = "param2"
+            const val PARAM3 = "special_key_param3"
+        }
+
+        private object DefaulsValues {
+            const val PARAM3 = "defaultParam3"
+        }
+    }
 }
 ```
 
-Here we obtain default SharedPreferences and provide methods for getting and saving the values of our parameters.
+Here we obtain default SharedPreferences and provide methods for getting and saving the values of our parameters. Also, we made `param3` different in that it uses a special preference key and has non-standard default value. 
 
-Again, we can see that we have some code duplication here. We can move some of it into private methods, of course. But it still leaves us with rather cumbersome code. Besides, what if we want to reuse this logic in some other class? Let's see how delegates can make the code a lot cleaner.
+Again, we can see that we have some code duplication here. We can move some of it into private methods, of course. But it would still leave us with rather cumbersome code. Besides, what if we want to reuse this logic in some other class? Let's see how delegates can make the code a lot cleaner.
 
 To spice things up, let's try a slightly different approach. This time, we will utilize [Object expressions](https://kotlinlang.org/docs/reference/object-declarations.html) and create extension functions for the SharedPreferences class.
 ```kotlin
 fun SharedPreferences.string(
-	defaultValue: String = "",
-	key: (KProperty<*>) -> String = KProperty<*>::name
+    defaultValue: String = "",
+    key: (KProperty<*>) -> String = KProperty<*>::name
 ): ReadWriteProperty<Any, String> =
-	object : ReadWriteProperty<Any, String> {
-		override fun getValue(thisRef: Any, property: KProperty<*>) =
-			getString(key(property), defaultValue)
+    object : ReadWriteProperty<Any, String> {
+        override fun getValue(thisRef: Any, property: KProperty<*>) =
+            getString(key(property), defaultValue)
 
-		override fun setValue(
-			thisRef: Any,
-			property: KProperty<*>,
-			value: String
-		) = edit().putString(key(property), value).apply()
-	}
+        override fun setValue(
+            thisRef: Any,
+            property: KProperty<*>,
+            value: String
+        ) = edit().putString(key(property), value).apply()
+    }
 ```
 Here we made a SharedPreferences extension function, that returns an object of an anonymous ReadWriteProperty subclass for our delegate. 
 
-The delegate reads property value as String from preferences, using provided `key` function for preference key. By default, the key is a property name, so we don't have to keep and pass any constants. At the same time, we still have an option to pass a custom key, if, for instance, we are afraid to run into key collisions inside the preferences, or want to be able to access the value explicitly. We can also provide default value for the property, in case it is not found in the preferences.
+The delegate reads property value as String from preferences, using provided `key` function for preference key. By default, the key is a property name, so we don't have to keep and pass any constants. At the same time, we still have an option to pass a custom key, if, for instance, we are afraid to run into key collisions inside the preferences, or want to have an explicit access to the key. We can also provide default value for the property, in case it is not found in the preferences.
 
 The delegate also takes care of storing new property value in the preferences, using the same `key` function.
 
 To make our `Settings` example work, we need to add two more delegates for String? and Int types, that work pretty much the same:
 ```kotlin
 fun SharedPreferences.stringNullable(
-	defaultValue: String? = null,
-	key: (KProperty<*>) -> String = KProperty<*>::name
+    defaultValue: String? = null,
+    key: (KProperty<*>) -> String = KProperty<*>::name
 ): ReadWriteProperty<Any, String?> =
-	object : ReadWriteProperty<Any, String?> {
-		override fun getValue(thisRef: Any, property: KProperty<*>) =
-			getString(key(property), defaultValue)
+    object : ReadWriteProperty<Any, String?> {
+        override fun getValue(thisRef: Any, property: KProperty<*>) =
+            getString(key(property), defaultValue)
 
-		override fun setValue(
-			thisRef: Any,
-			property: KProperty<*>,
-			value: String?
-		) = edit().putString(key(property), value).apply()
-	}
-	
+        override fun setValue(
+            thisRef: Any,
+            property: KProperty<*>,
+            value: String?
+        ) = edit().putString(key(property), value).apply()
+    }
+
 fun SharedPreferences.int(
-	defaultValue: Int = 0,
-	key: (KProperty<*>) -> String = KProperty<*>::name
+    defaultValue: Int = 0,
+    key: (KProperty<*>) -> String = KProperty<*>::name
 ): ReadWriteProperty<Any, Int> =
-	object : ReadWriteProperty<Any, Int> {
-		override fun getValue(thisRef: Any, property: KProperty<*>) =
-			getInt(key(property), defaultValue)
+    object : ReadWriteProperty<Any, Int> {
+        override fun getValue(thisRef: Any, property: KProperty<*>) =
+            getInt(key(property), defaultValue)
 
-		override fun setValue(
-			thisRef: Any,
-			property: KProperty<*>,
-			value: Int
-		) = edit().putInt(key(property), value).apply()
-	}	
+        override fun setValue(
+            thisRef: Any,
+            property: KProperty<*>,
+            value: Int
+        ) = edit().putInt(key(property), value).apply()
+    }	
 ```
 
 And now we can finally beatify our `Settings` class:
 ```kotlin
 class Settings(context: Context) {
 
-	private val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+    private val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
-	var param1 by prefs.stringNullable()
-	var param2 by prefs.int()
-	var param3 by prefs.string(
-		key = { "key_param3" },
-		defaultValue = "defaultParam3"
-	)
+    var param1 by prefs.stringNullable()
+    var param2 by prefs.int()
+    var param3 by prefs.string(
+        key = { "special_key_param3" },
+        defaultValue = "defaultParam3"
+    )
 }
 ```
 
-Looks a lot cooler!
+Now it looks much better. And if we need a new parameter in the future, it can be added literally with a single line of code!
 
 ## View delegates
 
