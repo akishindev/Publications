@@ -419,11 +419,11 @@ class CustomView @JvmOverloads constructor(
     }
 }
 ```
-Here we use [View binding](https://kotlinlang.org/docs/tutorials/android-plugin.html#view-binding) from [Kotlin Android Extensions](https://kotlinlang.org/docs/tutorials/android-plugin.html) to access views inside the layout.
+*Here we use [View binding](https://kotlinlang.org/docs/tutorials/android-plugin.html#view-binding) from [Kotlin Android Extensions](https://kotlinlang.org/docs/tutorials/android-plugin.html) to access views inside the layout.*
 
-It is clear that we have some code that can be easity moved to a separate entity. So let's do exactly that with the help of delegates! 
+It is clear that we have some code that can be easily moved to a separate entity. So let's do exactly that with the help of delegates! 
 
-Let's write a TextView extension function that returns a delegate for working with its text:
+Let's write a `TextView` extension function that returns a delegate for working with its text:
 ```kotlin
 fun TextView.text(): ReadWriteProperty<Any, String> =
     object : ReadWriteProperty<Any, String> {
@@ -453,7 +453,7 @@ class CustomView @JvmOverloads constructor(
 ```
 It may not seem like a crazy improvement over the original code, but the point is to demonstrate the power of delegates. Besides, they are so fun to write!
 
-Of course, you are not limited to TextView. For example, here is a delegate for view visibility (`keepBounds` determines whether the view should still take up space in layout or not when it's not visible):
+Of course, you are not limited to `TextView`. For example, here is a delegate for view visibility (`keepBounds` determines whether the view should still take up space in layout or not when it's not visible):
 ```kotlin
 fun View.isVisible(keepBounds: Boolean = false): ReadWriteProperty<Any, Boolean> =
     object : ReadWriteProperty<Any, Boolean> {
@@ -470,7 +470,7 @@ fun View.isVisible(keepBounds: Boolean = false): ReadWriteProperty<Any, Boolean>
     }
 ```
 
-And here is a delegate for progress in a ProgressBar as a float number from 0 to 1:
+Here is a delegate for progress in a `ProgressBar` as a float number from 0 to 1:
 ```kotlin
 fun ProgressBar.progress(): ReadWriteProperty<Any, Float> =
     object : ReadWriteProperty<Any, Float> {
@@ -482,7 +482,7 @@ fun ProgressBar.progress(): ReadWriteProperty<Any, Float> =
         }
     }
 ```
-And this is how we could use them if we had a progressBar in our `CustomView`:
+And this is how we could use them if we had a `progressBar` in our `CustomView`:
 ```kotlin
 class CustomView @JvmOverloads constructor(
     context: Context,
@@ -506,7 +506,7 @@ As you can see, you can delegate whatever you want - really, the sky is the limi
 
 ## Conclusion
 
-We looked at some examples of Kotlin delegates in Android development. Of course, you can think of many other ways to utilize them in your application. The goal was to demonstrate what a powerful tool they are, and what can be achieved with them. And, hopefully, now you're sold on the idea of using delegates yourself!
+We looked at some examples of Kotlin property delegates in Android development. Of course, you can think of many other ways to utilize them in your application. The goal was to demonstrate what a powerful tool they are, and what can be achieved with them. And, hopefully, now you're sold on the idea of using delegates yourself!
 
 
 *Author: Dmitry Akishin akishindev@gmail.com at Finch, 2019*
