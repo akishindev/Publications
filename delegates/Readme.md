@@ -1,11 +1,12 @@
 # Kotlin Delegates in Android
 
-Kotlin truly is a beautiful language with some great features that make application development a fun and exciting experience. One of such features is [Delegated Properties](https://kotlinlang.org/docs/reference/delegated-properties.html). In this post we will see how delegates can make our life easier in Android development.
+Kotlin truly is a beautiful language with some great features that make application development a fun and exciting experience. One of such features is [Delegated Properties](https://kotlinlang.org/docs/reference/delegated-properties.html). In this article we will see how delegates can make our life easier in Android development.
 
 * [Basics](#basics) 
 * [Fragment arguments](#fragment-arguments) 
 * [SharedPreferences delegates](#sharedpreferences-delegates)
 * [View delegates](#view-delegates)
+* [Conclusion](#conclusion)
 
 ## Basics
 
@@ -447,3 +448,7 @@ class CustomView @JvmOverloads constructor(
 ```
 
 As you can see, you can delegate whatever you want - really, the sky is the limit!
+
+## Conclusion
+
+We looked at some examples of Kotlin delegates specific to Android development. Of course, you can think of many other ways to utilize them in your application. The goal was to demonstrate what a powerful tool they are, and what can be achieved with them. And, hopefully, now you're sold on the idea of using delegates in your application!
