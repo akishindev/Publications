@@ -14,7 +14,7 @@ First things first, what is a delegate and how does it work? Well, while it may 
 
 A delegate is just a class that provides the value for a property and handles its changes. This allows us to move, or delegate, the getter-setter logic from the property itself to a separate class, letting us reuse this logic. 
 
-Let's say we want a String property `param` that always has a trimmed string, i.e. with leading and trailing whitespace removed. We could do this in the property's setter like this:
+Let's say we want a `String` property `param` that always has a trimmed string, i.e. with leading and trailing whitespace removed. We could do this in the property's setter like this:
 ```kotlin
 class Example {
 
@@ -166,40 +166,43 @@ Now we are ready to create the delegate itself:
 class FragmentArgumentDelegate<T : Any> : ReadWriteProperty<Fragment, T> {
 
     @Suppress("UNCHECKED_CAST")
-    override fun getValue(thisRef: Fragment, property: KProperty<*>): T =
-        thisRef.arguments
-            ?.get(property.name) as? T
+    override fun getValue(thisRef: Fragment, property: KProperty<*>): T {
+        val key = property.name
+        return thisRef.arguments
+            ?.get(key) as? T
             ?: throw IllegalStateException("Property ${property.name} could not be read")
+    }
 
     override fun setValue(thisRef: Fragment, property: KProperty<*>, value: T) {
         val args = thisRef.arguments
             ?: Bundle().also(thisRef::setArguments)
         val key = property.name
-
         args.put(key, value)
     }
 }
 ```
 The delegate reads property value from the fragment arguments. And when the property value changes, the delegate retrieves fragment arguments (or creates and sets new `Bundle` as arguments if the fragment doesn't have them yet), and then writes new value to these arguments, using the `Bundle.put` extension function we created before.
 
-Notice how we use the name of the property as the key for the argument, so we don't have to store the keys as constants anymore.
+`ReadWriteProperty` is a [generic](https://kotlinlang.org/docs/reference/generics.html) interface that accepts two type parameters. We set the first one as `Fragment`, making this delegate usable only for properties inside a fragment. This lets us access the fragment instance with `thisRef` and manage its arguments. 
 
-Another thing to note is that we explicitly set the type as non-nullable, and throw an exception if the value cannot be read. This allows us to have non-nullable properties in our fragment, sparing us from annoying null-checks.
+Note that we use the name of the property as the key for the argument, so that we don't have to store the keys as constants anymore.
+
+The second type parameter of `ReadWriteProperty` determines what kind of values the property can have. We explicitly set the type as non-nullable, and throw an exception if the value cannot be read. This allows us to have non-nullable properties in our fragment, sparing us from annoying null-checks.
 
 But sometimes we need a property to be nullable. So let's create another delegate that, if the argument is not found, doesn't throw an exception, but returns `null` instead:
 ```kotlin
 class FragmentNullableArgumentDelegate<T : Any?> : ReadWriteProperty<Fragment, T?> {
 
     @Suppress("UNCHECKED_CAST")
-    override fun getValue(thisRef: Fragment, property: KProperty<*>): T? =
-        thisRef.arguments
-            ?.get(property.name) as? T
+    override fun getValue(thisRef: Fragment, property: KProperty<*>): T? {
+        val key = property.name
+        return thisRef.arguments?.get(key) as? T
+    }
 
     override fun setValue(thisRef: Fragment, property: KProperty<*>, value: T?) {
         val args = thisRef.arguments
             ?: Bundle().also(thisRef::setArguments)
         val key = property.name
-
         value?.let { args.put(key, it) } ?: args.remove(key)
     }
 }
@@ -207,19 +210,19 @@ class FragmentNullableArgumentDelegate<T : Any?> : ReadWriteProperty<Fragment, T
 
 Next, let's make some functions for convenience (it is not necessary, just purely for aesthetic purposes):
 ```kotlin
-fun <T : Any> delegateArg(): ReadWriteProperty<Fragment, T> =
+fun <T : Any> argument(): ReadWriteProperty<Fragment, T> =
     FragmentArgumentDelegate()
 
-fun <T : Any> delegateArgNullable(): ReadWriteProperty<Fragment, T?> =
+fun <T : Any> argumentNullable(): ReadWriteProperty<Fragment, T?> =
     FragmentNullableArgumentDelegate()
 ```
 
-Finally, let's use our delegates in the fragment:
+Finally, let's put our delegates to use:
 ```kotlin
 class DemoFragment : Fragment() {
 
-    private var param1: Int by delegateArg()
-    private var param2: String by delegateArg()
+    private var param1: Int by argument()
+    private var param2: String by argument()
 
     companion object {
 
@@ -282,11 +285,11 @@ class Settings(context: Context) {
 }
 ```
 
-Here we obtain default SharedPreferences and provide methods for getting and saving the values of our parameters. Also, we made `param3` different in that it uses a special preference key and has non-standard default value. 
+Here we obtain default `SharedPreferences` and provide methods for getting and saving the values of our parameters. Also, we made `param3` different in that it uses a special preference key and has non-standard default value. 
 
 Again, we can see that we have some code duplication here. We can move some of it into private methods, of course. But it would still leave us with rather cumbersome code. Besides, what if we want to reuse this logic in some other class? Let's see how delegates can make the code a lot cleaner.
 
-To spice things up, let's try a slightly different approach. This time, we will utilize [Object expressions](https://kotlinlang.org/docs/reference/object-declarations.html) and create extension functions for the SharedPreferences class.
+To spice things up, let's try a slightly different approach. This time, we will utilize [Object expressions](https://kotlinlang.org/docs/reference/object-declarations.html) and create extension functions for the `SharedPreferences` class.
 ```kotlin
 fun SharedPreferences.string(
     defaultValue: String = "",
@@ -303,13 +306,13 @@ fun SharedPreferences.string(
         ) = edit().putString(key(property), value).apply()
     }
 ```
-Here we made a SharedPreferences extension function, that returns an object of an anonymous ReadWriteProperty subclass for our delegate. 
+Here we made a SharedPreferences extension function, that returns an object of an anonymous `ReadWriteProperty` subclass for our delegate. 
 
-The delegate reads property value as String from preferences, using provided `key` function for preference key. By default, the key is a property name, so we don't have to keep and pass any constants. At the same time, we still have an option to pass a custom key, if, for instance, we are afraid to run into key collisions inside the preferences, or want to have an explicit access to the key. We can also provide default value for the property, in case it is not found in the preferences.
+The delegate reads property value as `String` from preferences, using provided `key` function for preference key. By default, the key is a property name, so we don't have to keep and pass any constants. At the same time, we still have an option to pass a custom key, if, for instance, we are afraid to run into key collisions inside the preferences, or want to have an explicit access to the key. We can also provide default value for the property, in case it is not found in the preferences.
 
 The delegate also takes care of storing new property value in the preferences, using the same `key` function.
 
-To make our `Settings` example work, we need to add two more delegates for String? and Int types, that work pretty much the same:
+To make our `Settings` example work, we need to add two more delegates for `String?` and `Int` types, that work pretty much the same:
 ```kotlin
 fun SharedPreferences.stringNullable(
     defaultValue: String? = null,
@@ -342,7 +345,7 @@ fun SharedPreferences.int(
     }	
 ```
 
-And now we can finally beatify our `Settings` class:
+And now we can finally beautify our `Settings` class:
 ```kotlin
 class Settings(context: Context) {
 
