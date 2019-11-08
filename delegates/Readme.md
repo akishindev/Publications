@@ -26,7 +26,7 @@ class Example {
 ```
 *If you're confused about the syntax, please refer to the [Properties](https://kotlinlang.org/docs/reference/properties.html) page in the Kotlin docs.*
 
-Now, what if we want to reuse this behaviour in some other class? Here's where delegates come in to play:
+Now, what if we want to reuse this functionality in some other class? Here's where delegates come in to play:
 ```kotlin
 class TrimDelegate : ReadWriteProperty<Any?, String> {
 
