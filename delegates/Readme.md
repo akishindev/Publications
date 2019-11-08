@@ -10,9 +10,61 @@ Kotlin truly is a beautiful language with some great features that make applicat
 
 ## Basics
 
-First of all, what is a delegate and how does it work? Well, it's not that complicated. A delegate is just a class that provides the value for a property and handles its changes. This allows us to move, or delegate, the getter-setter logic from the property itself to a separate class, letting us reuse this logic. 
+First things first, what is a delegate and how does it work? Well, while it may look like some magic, it's really not that complicated.
 
-You can read more in the official [docs](https://kotlinlang.org/docs/reference/delegated-properties.html).
+A delegate is just a class that provides the value for a property and handles its changes. This allows us to move, or delegate, the getter-setter logic from the property itself to a separate class, letting us reuse this logic. 
+
+Let's say we want a String property `param` that always has a trimmed string, i.e. with leading and trailing whitespace removed. We could do this in the property's setter like this:
+```kotlin
+class Example {
+
+    var param: String = ""
+        set(value) {
+            field = value.trim()
+        }
+}
+```
+*If you're confused about the syntax, please refer to the [Properties](https://kotlinlang.org/docs/reference/properties.html) page in the Kotlin docs.*
+
+Now, what if we want to reuse this behaviour in some other class? Here's where delegates come in to play:
+```kotlin
+class TrimDelegate : ReadWriteProperty<Any?, String> {
+
+    private var trimmedString: String = ""
+
+    override fun getValue(thisRef: Any?, property: KProperty<*>): String {
+        return trimmedString
+    }
+
+    override fun setValue(thisRef: Any?, property: KProperty<*>, value: String) {
+        trimmedString = value.trim()
+    }
+}
+```
+So a delegate is just a class with two methods: for getting and setting value of a property. To give it some more information, it is provided with the property it's working with via the instance of [`KProperty`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.reflect/-k-property/index.html) class, and an object that has this property via `thisRef`. That's it! And here is how we can use this newly created delegate:
+```kotlin
+class Example {
+
+    var param: String by TrimDelegate()
+}
+```
+which is equivalent to this:
+```kotlin
+class Example {
+
+    private val delegate = TrimDelegate()
+    var param: String
+        get() = delegate.getValue(this, ::param)
+        set(value) {
+            delegate.setValue(this, ::param, value)
+        }
+}
+```
+*`::param` is an operator that returns an instance of `KProperty` class for the property.*
+
+As you can see, there is nothing mysterious about delegates. But despite their simplicity, they can be very useful. So let's look at some examples, specific to Android.
+
+*You can read more about delegates in the official [docs](https://kotlinlang.org/docs/reference/delegated-properties.html).*
 
 ## Fragment arguments
 
@@ -454,4 +506,4 @@ As you can see, you can delegate whatever you want - really, the sky is the limi
 We looked at some examples of Kotlin delegates in Android development. Of course, you can think of many other ways to utilize them in your application. The goal was to demonstrate what a powerful tool they are, and what can be achieved with them. And, hopefully, now you're sold on the idea of using delegates yourself!
 
 
-*Author: Dmitry Akishin akishindev@gmail.com*
+*Author: Dmitry Akishin akishindev@gmail.com at Finch, 2019*
