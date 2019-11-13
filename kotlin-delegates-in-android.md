@@ -263,7 +263,8 @@ Let's say we have some class that is responsible for saving and obtaining three 
 ```kotlin
 class Settings(context: Context) {
 
-    private val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+    private val prefs: SharedPreferences = 
+        PreferenceManager.getDefaultSharedPreferences(context)
 
     fun getParam1(): String? {
         return prefs.getString(PrefKeys.PARAM1, null)
@@ -282,7 +283,8 @@ class Settings(context: Context) {
     }
 
     fun getParam3(): String {
-        return prefs.getString(PrefKeys.PARAM3, null) ?: DefaulsValues.PARAM3
+        return prefs.getString(PrefKeys.PARAM3, null) 
+            ?: DefaulsValues.PARAM3
     }
 
     fun saveParam3(param3: String) {
@@ -303,7 +305,7 @@ class Settings(context: Context) {
 }
 ```
 
-Here we obtain default `SharedPreferences` and provide methods for getting and saving the values of our parameters. Also, we made `param3` different in that it uses a special preference key and has non-standard default value. 
+Here we obtain default `SharedPreferences` and provide methods for getting and saving the values of our parameters. We also made `param3` different in that it uses a special preference key and has non-standard default value. 
 
 Again, we can see that we have some code duplication here. We can move some of it into private methods, of course. But it would still leave us with rather cumbersome code. Besides, what if we want to reuse this logic in some other class? Let's see how delegates can make the code a lot cleaner.
 
