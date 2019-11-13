@@ -1,5 +1,7 @@
 # Kotlin Delegates in Android
 
+![Image](kotlin-delegates-in-android.png)
+
 Kotlin truly is a beautiful language with some great features that make application development a fun and exciting experience. One of such features is [Delegated Properties](https://kotlinlang.org/docs/reference/delegated-properties.html). In this article we will see how delegates can make our life easier in Android development.
 
 * [Basics](#basics) 
