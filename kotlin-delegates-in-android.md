@@ -46,7 +46,6 @@ class TrimDelegate : ReadWriteProperty<Any?, String> {
         trimmedValue = value.trim()
     }
 }
-
 ```
 So a delegate is just a class with two methods: for getting and setting value of a property. To give it some more information, it is provided with the property it's working with via the instance of [`KProperty`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.reflect/-k-property/index.html) class, and an object that has this property via `thisRef`. That's it! And here is how we can use this newly created delegate:
 ```kotlin
