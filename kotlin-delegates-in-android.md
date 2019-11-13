@@ -30,16 +30,23 @@ Now, what if we want to reuse this functionality in some other class? Here's whe
 ```kotlin
 class TrimDelegate : ReadWriteProperty<Any?, String> {
 
-    private var trimmedString: String = ""
+    private var trimmedValue: String = ""
 
-    override fun getValue(thisRef: Any?, property: KProperty<*>): String {
-        return trimmedString
+    override fun getValue(
+        thisRef: Any?,
+        property: KProperty<*>
+    ): String {
+        return trimmedValue
     }
 
-    override fun setValue(thisRef: Any?, property: KProperty<*>, value: String) {
-        trimmedString = value.trim()
+    override fun setValue(
+        thisRef: Any?,
+        property: KProperty<*>, value: String
+    ) {
+        trimmedValue = value.trim()
     }
 }
+
 ```
 So a delegate is just a class with two methods: for getting and setting value of a property. To give it some more information, it is provided with the property it's working with via the instance of [`KProperty`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.reflect/-k-property/index.html) class, and an object that has this property via `thisRef`. That's it! And here is how we can use this newly created delegate:
 ```kotlin
@@ -296,8 +303,10 @@ fun SharedPreferences.string(
     key: (KProperty<*>) -> String = KProperty<*>::name
 ): ReadWriteProperty<Any, String> =
     object : ReadWriteProperty<Any, String> {
-        override fun getValue(thisRef: Any, property: KProperty<*>) =
-            getString(key(property), defaultValue)
+        override fun getValue(
+            thisRef: Any,
+            property: KProperty<*>
+        ) = getString(key(property), defaultValue)
 
         override fun setValue(
             thisRef: Any,
@@ -308,7 +317,7 @@ fun SharedPreferences.string(
 ```
 Here we made a SharedPreferences extension function, that returns an object of an anonymous `ReadWriteProperty` subclass for our delegate. 
 
-The delegate reads property value as `String` from preferences, using provided `key` function for preference key. By default, the key is a property name, so we don't have to keep and pass any constants. At the same time, we still have an option to pass a custom key, if, for instance, we are afraid to run into key collisions inside the preferences, or want to have an explicit access to the key. We can also provide default value for the property, in case it is not found in the preferences.
+The delegate reads property value as `String` from preferences, using the provided `key` function for preference key. By default, the key is a property name, so we don't have to keep and pass any constants. At the same time, we still have an option to pass a custom key, if, for instance, we are afraid to run into key collisions inside the preferences, or want to have an explicit access to the key. We can also provide default value for the property, in case it is not found in the preferences.
 
 The delegate also takes care of storing new property value in the preferences, using the same `key` function.
 
@@ -319,8 +328,10 @@ fun SharedPreferences.stringNullable(
     key: (KProperty<*>) -> String = KProperty<*>::name
 ): ReadWriteProperty<Any, String?> =
     object : ReadWriteProperty<Any, String?> {
-        override fun getValue(thisRef: Any, property: KProperty<*>) =
-            getString(key(property), defaultValue)
+        override fun getValue(
+            thisRef: Any,
+            property: KProperty<*>
+        ) = getString(key(property), defaultValue)
 
         override fun setValue(
             thisRef: Any,
@@ -334,28 +345,31 @@ fun SharedPreferences.int(
     key: (KProperty<*>) -> String = KProperty<*>::name
 ): ReadWriteProperty<Any, Int> =
     object : ReadWriteProperty<Any, Int> {
-        override fun getValue(thisRef: Any, property: KProperty<*>) =
-            getInt(key(property), defaultValue)
+        override fun getValue(
+            thisRef: Any,
+            property: KProperty<*>
+        ) = getInt(key(property), defaultValue)
 
         override fun setValue(
             thisRef: Any,
             property: KProperty<*>,
             value: Int
         ) = edit().putInt(key(property), value).apply()
-    }	
+    }
 ```
 
 And now we can finally beautify our `Settings` class:
 ```kotlin
 class Settings(context: Context) {
 
-    private val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+    private val prefs: SharedPreferences =
+        PreferenceManager.getDefaultSharedPreferences(context)
 
     var param1 by prefs.stringNullable()
     var param2 by prefs.int()
     var param3 by prefs.string(
-        key = { "special_key_param3" },
-        defaultValue = "defaultParam3"
+        key = { "KEY_PARAM3" },
+        defaultValue = "default"
     )
 }
 ```
