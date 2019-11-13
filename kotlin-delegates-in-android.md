@@ -489,10 +489,16 @@ Of course, you are not limited to `TextView`. For example, here is a delegate fo
 ```kotlin
 fun View.isVisible(keepBounds: Boolean = false): ReadWriteProperty<Any, Boolean> =
     object : ReadWriteProperty<Any, Boolean> {
-        override fun getValue(thisRef: Any, property: KProperty<*>): Boolean =
-            visibility == View.VISIBLE
+        override fun getValue(
+            thisRef: Any,
+            property: KProperty<*>
+        ): Boolean = visibility == View.VISIBLE
 
-        override fun setValue(thisRef: Any, property: KProperty<*>, value: Boolean) {
+        override fun setValue(
+            thisRef: Any,
+            property: KProperty<*>,
+            value: Boolean
+        ) {
             visibility = when {
                 value -> View.VISIBLE
                 keepBounds -> View.INVISIBLE
@@ -506,10 +512,15 @@ Here's a delegate for progress in a `ProgressBar` as a float number from 0 to 1:
 ```kotlin
 fun ProgressBar.progress(): ReadWriteProperty<Any, Float> =
     object : ReadWriteProperty<Any, Float> {
-        override fun getValue(thisRef: Any, property: KProperty<*>): Float =
-            if (max == 0) 0f else progress / max.toFloat()
+        override fun getValue(
+            thisRef: Any,
+            property: KProperty<*>
+        ): Float = if (max == 0) 0f else progress / max.toFloat()
 
-        override fun setValue(thisRef: Any, property: KProperty<*>, value: Float) {
+        override fun setValue(
+            thisRef: Any,
+            property: KProperty<*>, value: Float
+        ) {
             progress = (value * max).toInt()
         }
     }
