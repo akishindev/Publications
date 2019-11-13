@@ -10,7 +10,7 @@ Kotlin truly is a beautiful language with some great features that make applicat
 
 ## Basics
 
-First things first, what is a delegate and how does it work? Well, while it may look like some magic, it's really not that complicated.
+First things first, what is a delegate and how does it work? Well, while it may seem like some kind of magic, it's really not that complicated.
 
 A delegate is just a class that provides the value for a property and handles its changes. This allows us to move, or delegate, the getter-setter logic from the property itself to a separate class, letting us reuse this logic. 
 
