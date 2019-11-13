@@ -172,14 +172,20 @@ Now we are ready to create the delegate itself:
 class FragmentArgumentDelegate<T : Any> : ReadWriteProperty<Fragment, T> {
 
     @Suppress("UNCHECKED_CAST")
-    override fun getValue(thisRef: Fragment, property: KProperty<*>): T {
+    override fun getValue(
+        thisRef: Fragment,
+        property: KProperty<*>
+    ): T {
         val key = property.name
         return thisRef.arguments
             ?.get(key) as? T
             ?: throw IllegalStateException("Property ${property.name} could not be read")
     }
 
-    override fun setValue(thisRef: Fragment, property: KProperty<*>, value: T) {
+    override fun setValue(
+        thisRef: Fragment,
+        property: KProperty<*>, value: T
+    ) {
         val args = thisRef.arguments
             ?: Bundle().also(thisRef::setArguments)
         val key = property.name
@@ -200,12 +206,18 @@ But sometimes we do need a property to be nullable. So let's create another dele
 class FragmentNullableArgumentDelegate<T : Any?> : ReadWriteProperty<Fragment, T?> {
 
     @Suppress("UNCHECKED_CAST")
-    override fun getValue(thisRef: Fragment, property: KProperty<*>): T? {
+    override fun getValue(
+        thisRef: Fragment,
+        property: KProperty<*>
+    ): T? {
         val key = property.name
         return thisRef.arguments?.get(key) as? T
     }
 
-    override fun setValue(thisRef: Fragment, property: KProperty<*>, value: T?) {
+    override fun setValue(
+        thisRef: Fragment,
+        property: KProperty<*>, value: T?
+    ) {
         val args = thisRef.arguments
             ?: Bundle().also(thisRef::setArguments)
         val key = property.name
