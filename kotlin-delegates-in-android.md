@@ -189,7 +189,7 @@ Note that we use the name of the property as the key for the argument, so that w
 
 The second type parameter of `ReadWriteProperty` determines what kind of values the property can have. We explicitly set the type as non-nullable, and throw an exception if the value cannot be read. This allows us to have non-nullable properties in our fragment, sparing us from annoying null-checks.
 
-But sometimes we need a property to be nullable. So let's create another delegate that, if the argument is not found, doesn't throw an exception, but returns `null` instead:
+But sometimes we do need a property to be nullable. So let's create another delegate that, if the argument is not found, doesn't throw an exception, but returns `null` instead:
 ```kotlin
 class FragmentNullableArgumentDelegate<T : Any?> : ReadWriteProperty<Fragment, T?> {
 
