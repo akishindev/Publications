@@ -241,7 +241,7 @@ Looks pretty neat, doesn't it?
 
 Quite often we need to store some values in memory to quickly retrieve them the next time the app launches. For example, we might want to store some user preferences that let users customize the app. A common way to do this is to use [SharedPreferences](https://developer.android.com/reference/android/content/SharedPreferences.html) and save key-value data in them. 
 
-So, let's say we have some class that is responsible for saving and obtaining three parameters:
+So let's say we have some class that is responsible for saving and obtaining three parameters:
 ```kotlin
 class Settings(context: Context) {
 
