@@ -454,10 +454,15 @@ Let's write a `TextView` extension function that returns a delegate for working 
 ```kotlin
 fun TextView.text(): ReadWriteProperty<Any, String> =
     object : ReadWriteProperty<Any, String> {
-        override fun getValue(thisRef: Any, property: KProperty<*>): String =
-            text.toString()
+        override fun getValue(
+            thisRef: Any,
+            property: KProperty<*>
+        ): String = text.toString()
 
-        override fun setValue(thisRef: Any, property: KProperty<*>, value: String) {
+        override fun setValue(
+            thisRef: Any,
+            property: KProperty<*>, value: String
+        ) {
             text = value
         }
     }
@@ -465,17 +470,17 @@ fun TextView.text(): ReadWriteProperty<Any, String> =
 And now use it in our `CustomView`:
 ```kotlin
 class CustomView @JvmOverloads constructor(
-	context: Context,
-	attrs: AttributeSet? = null
+    context: Context,
+    attrs: AttributeSet? = null
 ) : FrameLayout(context, attrs) {
 
-	var title by tvTitle.text()
-	var subtitle by tvSubtitle.text()
-	var description by tvDescription.text()
+    var title by tvTitle.text()
+    var subtitle by tvSubtitle.text()
+    var description by tvDescription.text()
 
-	init {
-		inflate(context, R.layout.custom_view, this)
-	}
+    init {
+        inflate(context, R.layout.custom_view, this)
+    }
 }
 ```
 It may not seem like a crazy improvement over the original code, but the point is to demonstrate the power of delegates. Besides, they are so fun to write!
@@ -497,7 +502,7 @@ fun View.isVisible(keepBounds: Boolean = false): ReadWriteProperty<Any, Boolean>
     }
 ```
 
-Here is a delegate for progress in a `ProgressBar` as a float number from 0 to 1:
+Here's a delegate for progress in a `ProgressBar` as a float number from 0 to 1:
 ```kotlin
 fun ProgressBar.progress(): ReadWriteProperty<Any, Float> =
     object : ReadWriteProperty<Any, Float> {
