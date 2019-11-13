@@ -549,7 +549,7 @@ As you can see, you can delegate whatever you want - really, the sky is the limi
 
 ## Conclusion
 
-We looked at some examples of Kotlin property delegates in Android development. Of course, you can think of many other ways to utilize them in your application. The goal was to demonstrate what a powerful tool they are, and what can be achieved with them. And, hopefully, now you're sold on the idea of using delegates yourself!
+We have looked at some examples of Kotlin property delegates in Android development. Of course, you can think of many other ways to utilize them in your application. The goal was to demonstrate what a powerful tool they are, and what can be achieved with them. And, hopefully, now you're sold on the idea of using delegates yourself!
 
 
 *Author: Dmitry Akishin akishindev@gmail.com at Finch, 2019*
