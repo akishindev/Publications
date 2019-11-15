@@ -476,15 +476,17 @@ class CustomView @JvmOverloads constructor(
     attrs: AttributeSet? = null
 ) : FrameLayout(context, attrs) {
 
-    var title by tvTitle.text()
-    var subtitle by tvSubtitle.text()
-    var description by tvDescription.text()
-
     init {
         inflate(context, R.layout.custom_view, this)
     }
+
+    var title by tvTitle.text()
+    var subtitle by tvSubtitle.text()
+    var description by tvDescription.text()
 }
 ```
+Make sure to initialize the properties after inflating the view in the init block, as the views must not be null.
+
 It may not seem like a crazy improvement over the original code, but the point is to demonstrate the power of delegates. Besides, they are so fun to write!
 
 Of course, you are not limited to `TextView`. For example, here is a delegate for view visibility (`keepBounds` determines whether the view should still take up space in layout or not when it's not visible):
@@ -534,16 +536,16 @@ class CustomView @JvmOverloads constructor(
     attrs: AttributeSet? = null
 ) : FrameLayout(context, attrs) {
 
+    init {
+        inflate(context, R.layout.custom_view, this)
+    }
+    
     var title by tvTitle.text()
     var subtitle by tvSubtitle.text()
     var description by tvDescription.text()
 
     var progress by progressBar.progress()
     var isProgressVisible by progressBar.isVisible()
-
-    init {
-        inflate(context, R.layout.custom_view, this)
-    }
 }
 ```
 
