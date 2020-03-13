@@ -1,28 +1,31 @@
-# Logging in Android
+# Easy logging in a multi-module Android project
 
-Logging is a useful and often necessary step in developing an Android application. It allows us to log errors, debug messages and other useful information. No doubt, every developer utilizes it one way or another - be it printing messages in console, or setting up an elaborate logging system. 
+No doubt, every Android delevoper is familiar with the concept of logging. We can log errors, debug messages and other useful information we might need during development. 
 
-Although logging may seem like a trivial task, it still can impose several challenges, especially in a multi-module project. In this post we will look at how we can easily set up logging in the app.
+And althought logging in Android is pretty easy and straightforward, it still can impose some challenges in a multi-module project. In this post we will look at at one way use can solve this problems.
 
-## Defining the task
+Note: we will use Kotlin, but it still can be easily adapted for a Java project.
 
-First, let's define the task at hand. Suppose we have a multi-module Kotlin project with this basic structure:
+## The problem
 
-![1](logging-1.png)
+Suppose we have a multi-module project. Among our modules we have a _domain_ module, that contains business logic of the app - domain entities and interactors. And as this module does not really need to know anything about Android, we made it a pure Kotlin module.
 
- - _app_ module is the main module of the app - it knows about other modules, sets up DI and makes other project-level configuring. Here lies our `Application` class.
- - _domain_ module contains business logic of the app - domain entities, interactors and repository interfaces. As it does not really need to know anything about Android or other modules, we want to keep it a pure Java module (hence the blue color on the diagram)
- - _data_ module has repository implementations. It's responsible for retrieving and mapping data via network, storing data in a database etc.
-  - _ui_ module contains presentation logic of the app - activities, fragments etc.
-  
- Now, we want to achieve logging that:
-  - has concise syntax;
-  - is available in every module;
-  - can be controlled in one place;
-  - let us keep full control.
- 
- Next, let's look at possible solutions.
- 
- ## Considering options
+So, we need a logging mechanism, that can be accessed in every module (including _domain_).
+Let's see what options we have:
+
+1) The first thing that comes to mind is, of course, an Android [Log](https://developer.android.com/reference/android/util/Log) class. It is a standard Android way of writing logs, that can be than [viewed in logcat](https://developer.android.com/studio/debug/am-logcat). There is a concise syntax in place and support for different log levels (error, debug, info, etc.), which is a good thing. The problem here though is that it is part of an Android library, so we can't use it in our _domain_ module (and other pure Java modules we might have).
+
+2) We might also look at Kotlin's [println](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.io/println.html) function. With this we can very easily print logs into logcat, and the messages will apperat under the tag `System.out`. But while we can use this method from everywhere in the app, it doesn't provide different log levels. Moreover, we might probably want to organize logging in one place, rather that having it scattered throughtout the app.
+
+3) The next thing we might try is using one of the third-party libraries, most notably [Timber](https://github.com/JakeWharton/timber). And while such a library could alleviate all our problems, it would mean we had to add the dependency to it in every module of our app, including our _domain_, and we will try to avoid that, especially for something as trivial as logging.
+
+4) Finally, probably the cleanest way would be to set up a logging interface in _domain_, implement it somewhere else (for example in the _app_ module), and provide it via (dependency injection)[https://developer.android.com/training/dependency-injection]. But that would mean we have to inject it in every class we need logging it, which is far from convenient and seems like an overkill.
+
+So it looks like all the options are not quite what we need...
+
+## Logger to the rescue!
+
+
+
  
  
