@@ -1,6 +1,6 @@
 # Easy logging in a multi-module Android project
 
-No doubt, every Android delevoper is familiar with the concept of logging. We can log errors, debug messages and other useful information we might need during development. 
+No doubt, every delevoper is familiar with the concept of logging. We can log errors, debug messages and other useful information we might need during development. 
 
 And although logging in Android is pretty easy and straightforward, it still can impose some challenges in a multi-module project. In this post we will look at one way to solve this problems.
 
@@ -27,11 +27,11 @@ So it looks like all the options are not quite what we need...
 
 Luckily, there is already a perfect logging solution out of the box - [java.util.logging.Logger](https://developer.android.com/reference/java/util/logging/Logger). And all we have to do is use it! So let's look at how to do this in Android.
 
-The process is actually quite simple - we obtain a logger object via the static `Logger.getLogger()` function, and use it to log messages with various `log` methods (that allow us to specify a log level, a message and an optional `Throwable` exception). Then these messages are forwarded to the registered [handlers](https://developer.android.com/reference/java/util/logging/Handler), that are free to handle these messages however they like. 
+The process is quite simple - we obtain a logger object via the static `Logger.getLogger()` function, and use it to log messages with various `log` methods (that allow us to specify a log level, a message and an optional `Throwable` exception). Then these messages are forwarded to the registered [handlers](https://developer.android.com/reference/java/util/logging/Handler), that are free to handle these messages however they like. 
 
 Basically, there is a ready-to-use logging interface in place, and our job is just to provide its implementation. And an important thing is that `Logger` is a java class, meaning we can use it in non-Android modules - which is exactly what we want.
 
-First, let's write an implementation of the handler. You can place it in any Android module visible by the main _app_ module, or in the _app_ module itself.
+Android actually provides a [default logging handler](https://github.com/aosp-mirror/platform_frameworks_base/blob/master/core/java/com/android/internal/logging/AndroidHandler.java). But to gain full control over what is being logged and how, let's write our own implementation. You can place it in any Android module visible by the main _app_ module, or in the _app_ module itself.
 
 ```kotlin
 class AndroidLoggingHandler : Handler() {
@@ -164,3 +164,17 @@ class MainActivity : AppCompatActivity() {
 ```
 
 Here we have it! With a single class and a couple of extension functions we set up a logging system that works in a milti-module project, has a concise syntax, is easy to configure and customize, and that we have total control over.
+
+## Extra profit
+
+In addition, there is maybe an unexpected, but nevertheless a rather pleasant advantage in our approach. 
+
+Some libraries use [java.util.logging.Logger](https://developer.android.com/reference/java/util/logging/Logger) for logging (e.g. [Socket.IO Client Library for Java](https://github.com/socketio/socket.io-client-java)). And our setup allows us to view and control logs from these libraries with no extra work! Moreover, these logs might not be loggable by the default Android handler - for example, Socket.IO library logs messages with level [Level.FINE](https://developer.android.com/reference/java/util/logging/Level#FINE), which are ignored by default. But with our own implementation, we can see the logs just fine.
+
+This also means that we can use [Logger](https://developer.android.com/reference/java/util/logging/Logger) in our own libraries that we want to reuse across different projects. This way we can integrate logs from these libraries into an existing logging system of each concrete project.
+
+## Conclusion
+
+There are different options we have when it comes to logging in Android. In this post we looked at one approach you can take to easily set up logging in a multi-module project.
+
+Author: Dmitry Akishin akishindev@gmail.com at Finch, 2020
