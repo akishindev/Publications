@@ -27,11 +27,11 @@ So it looks like all the options are not quite what we need...
 
 Luckily, there is already a perfect logging solution out of the box - [java.util.logging.Logger](https://developer.android.com/reference/java/util/logging/Logger). And all we have to do is use it! So let's look at how to do this in Android.
 
-The process is actually quite simple - we obtain a logger object via the static `Logger.getLogger` function, and use it to log messages with various `log` methods (that allow us specify a log level, a message and an optional `Throwable` exception). Then these messages get forwarded to registered [handlers](https://developer.android.com/reference/java/util/logging/Handler), that are free to handle these messages however they like. 
+The process is actually quite simple - we obtain a logger object via the static `Logger.getLogger()` function, and use it to log messages with various `log` methods (that allow us to specify a log level, a message and an optional `Throwable` exception). Then these messages get forwarded to registered [handlers](https://developer.android.com/reference/java/util/logging/Handler), that are free to handle these messages however they like. 
 
 Basically, we can look at it like this - there is a ready-to-use logging interface in place, and our job is just to provide its implementation. And an important thing is that `Logger` is a java class, meaning we can use it in non-Android modules - which is exactly what we want.
 
-First, let's write an implementation of the handler. You can place it in any Android module visible by the main `app` module, or the `app` module itself.
+First, let's write an implementation of the handler. You can place it in any Android module visible by the main _app_ module, or in the _app_ module itself.
 
 ```kotlin
 class AndroidLoggingHandler : Handler() {
@@ -72,13 +72,13 @@ class AndroidLoggingHandler : Handler() {
 }
 ```
 
-In `isLoggable()` we can control if a message can be logged. Here we use the default implementation (via a call to `super.isLoggable()`) and also add an additional condition - we want to enable logging only for debug builds.
+In `isLoggable()` we can control what messages we want to log and when. Here we use the default implementation (via a call to `super.isLoggable()`) and also add an additional condition - we want to enable logging only for debug builds.
 
 The `close()` and `flush()` methods are ignored as we don't need them.
 
-Finally, we implement the `publish()` function, that actually does the logging. We use the beforementioned Android [Log](https://developer.android.com/reference/android/util/Log) class and its `println()` method, that expects a tag, a log level and a message. As the tag we take the name of the logger. The log level is mapped in the `getAndroidLevel()` function. And the message is composed from the log message and a stack trace string of the exception, if present. We also wrap `println()` in a try-catch block, just in case something went wrong.
+Finally, we implement the `publish()` function that actually does the logging. We use the beforementioned Android [Log](https://developer.android.com/reference/android/util/Log) class and its `println()` method, that expects a tag, a log level and a message. For the tag we take the name of the logger. The log level is obtained from the `getAndroidLevel()` function, where we map [Logger.Level](https://developer.android.com/reference/java/util/logging/Level) to a level defined in [Log]. And the message is composed from the log message and a stack trace string of the exception, if present. We also wrap `println()` in a try-catch block, just in case something went wrong.
 
-Next, let's add a static function to setup the handler:
+Next, let's add a static function that sets up the handler:
 ```kotlin
 class AndroidLoggingHandler : Handler() {
 
@@ -98,7 +98,7 @@ class AndroidLoggingHandler : Handler() {
 ```
 We remove all handlers from the root logger and add our own implementation. We also specify [Level.FINE](https://developer.android.com/reference/java/util/logging/Level#FINE) as the minimum level for messages we want to log.
 
-Now that we have our `Handler` ready, time to set it up in our [Application](https://developer.android.com/reference/android/app/Application) class:
+Now that we have our `Handler` ready, we can set it up in our [Application](https://developer.android.com/reference/android/app/Application) class:
 
 ```kotlin
 class App : Application() {
@@ -120,6 +120,8 @@ class MainActivity : Activity(){
     override fun onPause() {
         super.onPause()
         Logger.getLogger("MainActivity").log(Level.FINE, "Activity is paused")
+        Logger.getLogger("MainActivity")
+            .log(Level.SEVERE, "Something went wrong", Throwable("some random error"))
     }
 }
 ```
@@ -127,7 +129,7 @@ class MainActivity : Activity(){
 ...and the messages will be visible in [logcat](https://developer.android.com/studio/debug/am-logcat):
 ![logcat](logging-1.png)
  
-However, the syntax is still not very concise and can be approved upon. So let's utilize Koltin [extensions](https://kotlinlang.org/docs/reference/extensions.html). Here are some extension functions we can write (we can place them in `domain`):
+However, the syntax is still not very concise and contains some boilerplate. So let's utilize Koltin [extensions](https://kotlinlang.org/docs/reference/extensions.html) (we can place them in the _domain_ module):
 
 ```kotlin
 fun Any.logD(message: String) {
@@ -159,3 +161,5 @@ class MainActivity : AppCompatActivity() {
     }
 }
 ```
+
+Here we have it! With a single class and a couple of extension functions we set up a logging system that works in a milti-modue project, has a concise syntax, is easy to configure and customize, and that we have total control over.
