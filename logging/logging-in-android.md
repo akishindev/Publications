@@ -177,4 +177,4 @@ This also means that we can use [Logger](https://developer.android.com/reference
 
 There are different options we have when it comes to logging in Android. In this post we looked at one approach you can take to easily set up logging in a multi-module project.
 
-Author: Dmitry Akishin akishindev@gmail.com at Finch, 2020
+_Author: Dmitry Akishin akishindev@gmail.com at Finch, 2020_
