@@ -25,7 +25,7 @@ So it looks like all the options are not quite what we need...
 
 ## Logger to the rescue!
 
-Luckily, there is already a perfect logging mechanish out of the box - [java.util.logging.Logger](https://developer.android.com/reference/java/util/logging/Logger). And all we have to do is use it! So let's look at how to do this in Android.
+Luckily, there is already a perfect logging solution out of the box - [java.util.logging.Logger](https://developer.android.com/reference/java/util/logging/Logger). And all we have to do is use it! So let's look at how to do this in Android.
 
 The process is actually quite simple - we obtain a logger object via the static `Logger.getLogger` function, and use it to log messages with various `log` methods (that allow us specify a log level, a message and an optional `Throwable` exception). Then these messages get forwarded to registered [handlers](https://developer.android.com/reference/java/util/logging/Handler), that are free to handle these messages however they like. 
 
