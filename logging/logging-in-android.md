@@ -125,10 +125,37 @@ class MainActivity : Activity(){
 ```
 
 ...and the messages will be visible in [logcat](https://developer.android.com/studio/debug/am-logcat):
-
+![logcat](logging-1.png)
  
-However, the syntax is still not that convenient. So let's utilize Koltin [extensions](https://kotlinlang.org/docs/reference/extensions.html). Here are some extension functions we can write (we can place them in `domain`):
+However, the syntax is still not very concise and can be approved upon. So let's utilize Koltin [extensions](https://kotlinlang.org/docs/reference/extensions.html). Here are some extension functions we can write (we can place them in `domain`):
 
 ```kotlin
+fun Any.logD(message: String) {
+    logger.log(Level.FINE, message)
+}
 
+fun Any.logE(message: String) {
+    logger.log(Level.SEVERE, message)
+}
+
+fun Any.logE(message: String, throwable: Throwable) {
+    logger.log(Level.SEVERE, message, throwable)
+}
+
+private val Any.logger: Logger
+    get() = Logger.getLogger(this::class.java.simpleName)
+```
+
+And now it is much more convenient and pretty:
+```kotlin
+class MainActivity : AppCompatActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        logD("Activity is created")
+        logE("Something went wrong", Throwable("some random error"))
+    }
+}
 ```
