@@ -2,7 +2,7 @@
 
 No doubt, every Android delevoper is familiar with the concept of logging. We can log errors, debug messages and other useful information we might need during development. 
 
-And although logging in Android is pretty easy and straightforward, it still can impose some challenges in a multi-module project. In this post we will look at at one way use can solve this problems.
+And although logging in Android is pretty easy and straightforward, it still can impose some challenges in a multi-module project. In this post we will look at one way to solve this problems.
 
 _Note: we will use Kotlin, but it still can be easily adapted for a Java project._
 
