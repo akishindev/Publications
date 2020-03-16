@@ -15,7 +15,7 @@ Suppose we have a multi-module project. Among our modules we have a _domain_ mod
 So, we need a logging mechanism that can be accessed in every module (including _domain_).
 Let's see what options we have:
 
-1) The first thing that comes to mind is, of course, Android [Log](https://developer.android.com/reference/android/util/Log) class. It is a standard Android way of writing logs, that can be then [viewed in logcat](https://developer.android.com/studio/debug/am-logcat). It has a concise syntax and support for different log levels (error, debug, info, etc.), which is a good thing. The problem here though is that it is a part of an Android library, so we can't use it in our _domain_ module (and other pure Kotlin modules we might have).
+1) The first thing that comes to mind is, of course, the Android [Log](https://developer.android.com/reference/android/util/Log) class. It is a standard Android way of writing logs, that can be then [viewed in logcat](https://developer.android.com/studio/debug/am-logcat). It has a concise syntax and support for different log levels (error, debug, info, etc.), which is a good thing. The problem here though is that it is a part of an Android library, so we can't use it in our _domain_ module (and other pure Kotlin modules we might have).
 
 2) We might also look at Kotlin's [println](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.io/println.html) function. With this we can very easily print logs into logcat, and the messages will appear under the tag "System.out". But while we can use this method from anywhere in the app, it doesn't provide different log levels. Moreover, we might probably want to organize logging in one place, rather that having it scattered throughout the app.
 
