@@ -1,4 +1,6 @@
-# Easy logging in a multi-module Android project
+# Logging in a multi-module Android project
+
+![cover](logging_dark.PNG)
 
 No doubt, every delevoper is familiar with the concept of logging. We can log errors, debug messages and other useful information we might need during development. 
 
@@ -175,6 +177,6 @@ This also means that we can use [Logger](https://developer.android.com/reference
 
 ## Conclusion
 
-There are different options we have when it comes to logging in Android. In this post we looked at one approach you can take to easily set up logging in a multi-module project.
+There are different options we have when it comes to logging in Android. In this post we looked at one approach you can take to easily set up logging in a multi-module project. Hopefully, you are now convinced to adopt it in your own projects!
 
 _Author: Dmitry Akishin akishindev@gmail.com at Finch, 2020_
